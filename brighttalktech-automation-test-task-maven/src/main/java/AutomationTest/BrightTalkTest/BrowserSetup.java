@@ -13,7 +13,7 @@ public class BrowserSetup extends BasePage {
     private static final String CHROME_WIN = "src\\test\\java\\BrowserDirectory\\chromedriver.exe";
     private static final String EDGE = "src\\test\\java\\BrowserDirectory\\MicrosoftWebDriver.exe";
     private static final String FIREFOX_WIN = "src\\test\\java\\BrowserDirectory\\geckodriver.exe";
-    private static final String CHROME_MAC = "src/test/java/BrowserDirectory/chromedriver-Mac";
+    private static final String CHROME_MAC = "src/test/java/BrowserDirectory/chromedriver";
 
 
     /**
@@ -37,7 +37,7 @@ public class BrowserSetup extends BasePage {
             System.setProperty("webdriver.geckos.driver", FIREFOX_WIN);
             driver = new FirefoxDriver();
         } else if (browser.equalsIgnoreCase("chromeMac")) {
-            System.setProperty("webdriver.chromes.driver", CHROME_MAC);
+            System.setProperty("webdriver.chrome.driver", CHROME_MAC);
             driver = new ChromeDriver();
         } else {
             Assert.fail(MessageFormat.format("Wrong Browser: {0}", browser));
