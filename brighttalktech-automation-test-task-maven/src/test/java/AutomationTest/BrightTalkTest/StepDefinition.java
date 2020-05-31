@@ -5,9 +5,13 @@ import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
 import static AutomationTest.BrightTalkTest.HomePage.homePage;
+import static org.junit.Assert.assertEquals;
+
 import java.util.List;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.testng.Assert;
+
 import static AutomationTest.BrightTalkTest.HTTPMethods.getResponseStatus;
 import static AutomationTest.BrightTalkTest.HTTPMethods.isResponseContainsKey;
 import static AutomationTest.BrightTalkTest.HTTPMethods.getJsonResponseAsString;
@@ -20,34 +24,28 @@ public class StepDefinition {
 	String baseUrl = "https://reqres.in/api";
 	String getUsersPaginationPath = "/users?page=1";
 	String invalidUserPath = "/user/55";
-
+	int statusCode;
+	String responseData;
 	@Given("^I am on the home page$")
 	public void iAmOnTheHomePage() {
 
 		homePage();
 	}
 
-	// displaying list of users received from server
+	//  Hit the url and get Status code
 	@Given("^I get the default list of users for on 1st page$")
 	public void getDefaultListOfUsers() throws JSONException {
-		String response = getJsonResponseAsString(baseUrl + getUsersPaginationPath);
-		System.out.println("Defualt list of user are getting displayed");
-		System.out.println(response);
-
+		 statusCode = getResponseStatus(baseUrl + getUsersPaginationPath);		
 	}
 
 	// verifying the status code , if it is 200OK, verifying for a key element
 	@When("^I get the list of all users$")
-	public void getFirstPageListOfUsers() {
-		int response = getResponseStatus(baseUrl + getUsersPaginationPath);
-		if (response == 200) {
+	public void getFirstPageListOfUsers(DataTable dt) {
+		List<String> list = dt.asList(String.class);
+		assertEquals(list.get(1), String.valueOf(statusCode));
+		if (statusCode == 200) {
 			boolean isFound = isResponseContainsKey(baseUrl + getUsersPaginationPath, "first_name");
-			if (isFound) {
-				System.out.println("Server responded with 200OK, List of all users are getting displayed");
-			} else {
-				System.out.println("Server responded with Error status code" + response);
-			}
-
+			Assert.assertTrue(isFound);
 		}
 
 	}
@@ -71,7 +69,7 @@ public class StepDefinition {
 
 		System.out.print("Expected:" + expectedUserCount);
 		System.out.print("Actual:" + actualUserCount);
-
+        assertEquals(expectedUserCount,actualUserCount);
 		if (expectedUserCount.equalsIgnoreCase(actualUserCount)) {
 			System.out.println("Total user count is equal to no of user ID's");
 		} else {
@@ -80,20 +78,18 @@ public class StepDefinition {
 	}
 
 //searching for an object which is not present 
-	@Given("^I make a search for user 55$")
-	public void searchUser() throws JSONException {
-
-		getJsonResponseAsString(baseUrl + invalidUserPath);
+	@Given("^I make a search for user with below ID$")
+	public void searchUser(DataTable dt) throws JSONException {
+		List<String> list = dt.asList(String.class);
+		  responseData=getJsonResponseAsString(baseUrl + "/user/"+list.get(1));
 	}
 
 //validating error
 	@Then("^I receive error code in response$")
-	public void validateErrorCode() {
-
-		String response = getJsonResponseAsString(baseUrl + invalidUserPath);
-		if (response.equals("User not found")) {
-			System.out.println("User not found");
-		}
+	public void validateErrorCode(DataTable dt) {
+		List<String> list = dt.asList(String.class);		
+assertEquals(list.get(1),responseData);
+		
 	}
 
 //creating a user, handled in HTTPMethods

@@ -6,6 +6,8 @@ import io.restassured.response.Response;
 import io.restassured.response.ResponseBody;
 import io.restassured.specification.RequestSpecification;
 
+import static org.junit.Assert.assertEquals;
+
 import org.json.JSONException;
 
 import static io.restassured.RestAssured.*;
@@ -46,24 +48,24 @@ public class HTTPMethods {
 		System.out.println("Body of a String is " + bodyAsString);
 		return bodyAsString.contains(key);
 	}
-	// This method will return String from response
+	// This method will return String from response *refined
 
 	public static String getJsonResponseAsString(String baseUrl) {
 		RestAssured.baseURI = baseUrl;
 		RequestSpecification httpRequest = RestAssured.given();
 		Response response = httpRequest.get(baseUrl);
-		if (response.statusCode() == 200) {
-			System.out.println("User found");
+		try{
+			assertEquals(200,response.statusCode());
 			ResponseBody body = response.getBody();
 
 			String bodyAsString = body.asString();
 			System.out.println("RESPONSE IN STRING " + bodyAsString);
 			return bodyAsString;
 
-		} else {
-			System.out.println("User not found");
-			return "User not found";
-		}
+			}catch(AssertionError e){
+				System.out.println("Failure Status code is:"+response.statusCode());
+			return String.valueOf(response.statusCode());
+			}
 
 	}
 
