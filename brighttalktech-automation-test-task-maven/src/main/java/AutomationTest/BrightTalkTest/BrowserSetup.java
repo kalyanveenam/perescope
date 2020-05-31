@@ -28,13 +28,13 @@ public class BrowserSetup extends BasePage {
         browser = LoadProp.getproperty("Browser");
 
         if (browser.equalsIgnoreCase("Chrome")) {
-            System.setProperty("webdriver.chromes.driver", CHROME_WIN);
+            System.setProperty("webdriver.chrome.driver", CHROME_WIN);
             driver = new ChromeDriver();
         } else if (browser.equalsIgnoreCase("edge")) {
-            System.setProperty("webdriver.edges.driver", EDGE);
+            System.setProperty("webdriver.edge.driver", EDGE);
             driver = new EdgeDriver();
         } else if (browser.equalsIgnoreCase("Firefox")) {
-            System.setProperty("webdriver.geckos.driver", FIREFOX_WIN);
+            System.setProperty("webdriver.gecko.driver", FIREFOX_WIN);
             driver = new FirefoxDriver();
         } else if (browser.equalsIgnoreCase("chromeMac")) {
             System.setProperty("webdriver.chrome.driver", CHROME_MAC);
