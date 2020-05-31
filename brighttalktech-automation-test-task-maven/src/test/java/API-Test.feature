@@ -2,15 +2,12 @@ Feature: API test
 
   Scenario: Should see LIST USERS of all existing users
     Given I get the default list of users for on 1st page
-#    When I get the list of all users
-#    Then I should see total users count equals to number of user ids
+    When I get the list of all users
+    Then I should see total users count equals to number of user ids
 #
-#  Scenario: Should see SINGLE USER data
-#    Given I make a search for user 3
-#    Then I should see following user data
-#      | first_name    | email         |
+#       | first_name    | email         |
 #      | <enter value> | <enter value> |
-#
+
 #  Scenario: Should see SINGLE USER NOT FOUND error code
 #    Given I make a search for user 55
 #    Then I receive error code <enter value> in response
