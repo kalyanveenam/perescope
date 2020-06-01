@@ -7,6 +7,8 @@ import io.restassured.response.ResponseBody;
 import io.restassured.specification.RequestSpecification;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -15,8 +17,10 @@ import static io.restassured.RestAssured.*;
 
 public class HTTPMethods {
 	static String ResponsePost;
+	static String ResponseLogin;
 	static String loginResponse;
 	static String request_body;
+	
 
 // input: baseURL
 // functionality: HTTP GET call and converts response to String
@@ -93,25 +97,24 @@ public class HTTPMethods {
 	}
 	
 	
-
-//end here
-	
-	
-	
 	
 //Validating the response 
-	public static void validateResponse(String baseUrl, String email, String password) {
-		String bo = " '   {  '  + \r\n" + " '       \"email\": \"eve.holt@reqres.in\",  '  + \r\n"
-				+ " '       \"password\": \"cityslicka\"  '  + \r\n" + " '  }  ' ; ";
-
-		RestAssured.baseURI = "https://reqres.in";
-
-		String Resp = given().body(bo).when().post("/api/login").then().assertThat().statusCode(400).and()
-				.contentType(ContentType.JSON).and().header("server", "cloudflare").and().header("content-length", "37")
+	public static String validateResponseLogin(String baseUrl, String email, String password, String expectedStatus) {
+		
+			request_body = "    {\r\n" + "\"email\": \""+email+"\", \r\n"+"\"password\": \""+password +"\"}";
+		
+		RestAssured.baseURI = baseUrl;
+		System.out.print(request_body);
+		ResponseLogin = given().body(request_body).when().post("/login").then().assertThat().statusCode(Integer.valueOf(expectedStatus)).and()
+				.contentType(ContentType.JSON).and().header("server", "cloudflare")
 				.extract().response().asString();
-
-		System.out.println("Response is\t" + Resp);
+		System.out.println(ResponsePost);
+		return ResponseLogin;
+		
+		
+		
 	}
+	
 
 	
 	
