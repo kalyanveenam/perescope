@@ -9,6 +9,9 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
+
+import org.awaitility.Awaitility;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.testng.Assert;
@@ -57,9 +60,9 @@ public class StepDefinition {
 	// As the response has paginated data, marking case as pass when
 	// total count=length of user array* number of pages
 	@Then("^I should see total users count equals to number of user ids$")
-	public void verifyUserCountEqualsuserId() throws JSONException {
-
-		String response = getJsonResponseAsString(baseUrl + getUsersPaginationPath);
+	public void verifyUserCountEqualsuserId(DataTable dt) throws JSONException {
+		List<String> list = dt.asList(String.class);
+		String response = getJsonResponseAsString(baseUrl + getUsersPaginationPath, Integer.valueOf(list.get(1)));
 		JSONObject json = new JSONObject(response);
 		String expectedUserCount = json.get("total").toString();
 
@@ -84,14 +87,14 @@ public class StepDefinition {
 	@Given("^I make a search for user with below ID$")
 	public void searchUser(DataTable dt) throws JSONException {
 		List<String> list = dt.asList(String.class);
-		responseData = getJsonResponseAsString(baseUrl + "/user/" + list.get(1));
+		statusCode = getResponseStatus(baseUrl + "/user/" + list.get(1));
 	}
 
 //validating error
 	@Then("^I receive error code in response$")
 	public void validateErrorCode(DataTable dt) {
 		List<String> list = dt.asList(String.class);
-		assertEquals(list.get(1), responseData);
+		assertEquals(list.get(1), String.valueOf(statusCode));
 
 	}
 
@@ -117,7 +120,8 @@ public class StepDefinition {
 		System.out.println("Password - " + list.get(1));
 
 		String loginResponse = validateResponseLogin(baseUrl, list.get(0), list.get(1), list.get(2));
-		assertFalse(loginResponse.contains(null));
+System.out.println(loginResponse);
+assertFalse(loginResponse.isEmpty());
 	}
 
 	@Given("^I login unsuccesfully with following data$")
@@ -134,8 +138,7 @@ public class StepDefinition {
 	@Given("^I wait for user list to load$")
 	public void waitForUserListToLoad(DataTable dt) throws InterruptedException {
 		List<String> list = dt.asList(String.class);
-		Long MAX_TIMEOUT = Long.valueOf(list.get(1));
-		delayedResponse = getJsonResponseAsString(baseUrl + delayedResponsePath);
+		delayedResponse = getJsonResponseAsString(baseUrl + delayedResponsePath, Integer.valueOf(list.get(1)));
 	}
 
 //verifying each ID is unique 

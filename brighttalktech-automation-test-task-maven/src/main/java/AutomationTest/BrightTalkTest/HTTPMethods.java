@@ -1,6 +1,8 @@
 package AutomationTest.BrightTalkTest;
 
 import io.restassured.RestAssured;
+import io.restassured.config.HttpClientConfig;
+import io.restassured.config.RestAssuredConfig;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 import io.restassured.response.ResponseBody;
@@ -10,6 +12,10 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import org.apache.http.params.CoreConnectionPNames;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -55,9 +61,16 @@ public class HTTPMethods {
 	}
 	// This method will return String from response *refined
 
-	public static String getJsonResponseAsString(String baseUrl) {
+	public static String getJsonResponseAsString(String baseUrl, int waitPeriod) {
 		RestAssured.baseURI = baseUrl;
-		RequestSpecification httpRequest = RestAssured.given();
+		@SuppressWarnings("deprecation")
+		RestAssuredConfig config = RestAssured.config()
+		        .httpClient(HttpClientConfig.httpClientConfig()
+		                .setParam(CoreConnectionPNames.CONNECTION_TIMEOUT, waitPeriod)
+		                .setParam(CoreConnectionPNames.SO_TIMEOUT, waitPeriod));
+
+		
+		RequestSpecification httpRequest = RestAssured.given().config(config).param("limit", waitPeriod);
 		Response response = httpRequest.get(baseUrl);
 		try{
 			assertEquals(200,response.statusCode());
@@ -81,7 +94,7 @@ public class HTTPMethods {
 		request_body = " '   {  '  + \r\n" + " '       \"name\": \"" + name + "+\",  '  + \r\n"
 				+ " '       \"job\": \"\"" + job + "  '  + \r\n" + " '  }  ' ; ";
 		RestAssured.baseURI = baseUrl;
-
+		System.out.print(request_body);
 	}
 
 //Reusabe method which will verify Response coming after POST call to the server
@@ -101,20 +114,23 @@ public class HTTPMethods {
 //Validating the response 
 	public static String validateResponseLogin(String baseUrl, String email, String password, String expectedStatus) {
 		
-			request_body = "    {\r\n" + "\"email\": \""+email+"\", \r\n"+"\"password\": \""+password +"\"}";
+	RestAssured.baseURI = baseUrl;
+	
+		Map<String,String> requestBody= new HashMap<String,String>();
 		
-		RestAssured.baseURI = baseUrl;
-		System.out.print(request_body);
-		ResponseLogin = given().body(request_body).when().post("/login").then().assertThat().statusCode(Integer.valueOf(expectedStatus)).and()
-				.contentType(ContentType.JSON).and().header("server", "cloudflare")
-				.extract().response().asString();
-		System.out.println(ResponsePost);
-		return ResponseLogin;
+		requestBody.put("email",email);
+		requestBody.put("password",password);
 		
-		
+		ResponsePost = given().contentType(ContentType.JSON).baseUri(baseUrl).basePath("/login").with().body(requestBody).post().then().toString();
+		String expStatus = null;
+		if(ResponsePost!=null) {
+			 expStatus="400";
+		}
+		return ResponsePost;
 		
 	}
 	
+
 
 	
 	
