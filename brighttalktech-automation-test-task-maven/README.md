@@ -23,3 +23,10 @@ Please develop the automation task using this simple framework.
  
  https://github.com/kalyanveenam/periscope.git 
  
+### Update:
+Updated code as per comments
+1. Added Asserts and added validations to verify successpath and failure path
+2.Added code for delayed response 
+3.Added login unsuccessfull scenario 
+ 
+ Updated code is present in same link with latest commit
