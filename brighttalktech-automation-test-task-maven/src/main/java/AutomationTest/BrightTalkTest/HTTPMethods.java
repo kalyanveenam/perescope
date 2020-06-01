@@ -9,11 +9,12 @@ import io.restassured.specification.RequestSpecification;
 import static org.junit.Assert.assertEquals;
 
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import static io.restassured.RestAssured.*;
 
 public class HTTPMethods {
-	static String Resp;
+	static String ResponsePost;
 	static String loginResponse;
 	static String request_body;
 
@@ -71,31 +72,33 @@ public class HTTPMethods {
 
 	// This reusable method allows users to do POST Operation by providing required
 	// fields
-	public static void POSTRequest(String baseUrl, String name, String job) {
+	public static void POSTRequestCreate(String baseUrl, String name, String job) {
 
 		request_body = " '   {  '  + \r\n" + " '       \"name\": \"" + name + "+\",  '  + \r\n"
 				+ " '       \"job\": \"\"" + job + "  '  + \r\n" + " '  }  ' ; ";
-
 		RestAssured.baseURI = baseUrl;
 
-		  given().body(request_body).when().post("/api/users").then().assertThat().statusCode(201)
-				.and().contentType(ContentType.JSON).and().header("server", "cloudflare").and()
-				.header("content-length", "51").extract().response().asString();
-
-		System.out.println("Response is\t" + Resp);
-
 	}
 
-//POST call for login Functionality
-	public static void getResponsePostCall() throws JSONException {
+//Reusabe method which will verify Response coming after POST call to the server
+	//This method is used to validate response during login as well as crate user
+	public static String getResponsePostCall() throws JSONException {
 
-		Resp = given().body("bo").when().post("/users").then().assertThat().statusCode(201).and()
-				.contentType(ContentType.JSON).and().header("server", "cloudflare").and().header("content-length", "51")
+		ResponsePost = given().body(request_body).when().post("/users").then().assertThat().statusCode(201).and()
+				.contentType(ContentType.JSON).and().header("server", "cloudflare")
 				.extract().response().asString();
-		System.out.println(Resp);
+		System.out.println(ResponsePost);
+		return ResponsePost;
 
 	}
+	
+	
 
+//end here
+	
+	
+	
+	
 //Validating the response 
 	public static void validateResponse(String baseUrl, String email, String password) {
 		String bo = " '   {  '  + \r\n" + " '       \"email\": \"eve.holt@reqres.in\",  '  + \r\n"
@@ -109,5 +112,12 @@ public class HTTPMethods {
 
 		System.out.println("Response is\t" + Resp);
 	}
+
+	
+	
+	
+	
+	
+	
 
 }

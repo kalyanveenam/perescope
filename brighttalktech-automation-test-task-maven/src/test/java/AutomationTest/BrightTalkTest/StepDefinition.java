@@ -17,15 +17,19 @@ import static AutomationTest.BrightTalkTest.HTTPMethods.isResponseContainsKey;
 import static AutomationTest.BrightTalkTest.HTTPMethods.getJsonResponseAsString;
 import static AutomationTest.BrightTalkTest.HTTPMethods.getResponsePostCall;
 import static AutomationTest.BrightTalkTest.HTTPMethods.validateResponse;
-import static AutomationTest.BrightTalkTest.HTTPMethods.POSTRequest;
+import static AutomationTest.BrightTalkTest.HTTPMethods.POSTRequestCreate;
+
+
 
 public class StepDefinition {
 	// declaring global variables
 	String baseUrl = "https://reqres.in/api";
 	String getUsersPaginationPath = "/users?page=1";
 	String invalidUserPath = "/user/55";
+	String delayedResponsePath="/users?delay=3";
 	int statusCode;
 	String responseData;
+	String delayedResponse;
 	@Given("^I am on the home page$")
 	public void iAmOnTheHomePage() {
 
@@ -95,13 +99,15 @@ assertEquals(list.get(1),responseData);
 //creating a user, handled in HTTPMethods
 	@Given("I create user with following (.*) (.*)")
 	public void createUserWithData(String name, String job) throws JSONException {
-		POSTRequest(baseUrl, name, job);
+		POSTRequestCreate(baseUrl, name, job);
 	}
 
 //verifying the response after posting the data
 	@Then("response should contain folowing data")
-	public void verifyUser() throws JSONException {
-		getResponsePostCall();
+	public void verifyUser(DataTable dt) throws JSONException {
+		List<String> list = dt.asList(String.class);
+		String postResponse=getResponsePostCall();
+		Assert.assertTrue(postResponse.contains(list.get(0)) || postResponse.contains(list.get(1)));
 	}
 
 //Validating login functionality, using data table to pass data
@@ -117,26 +123,31 @@ assertEquals(list.get(1),responseData);
 
 //verify user is present after loading a page for some time
 	@Given("^I wait for user list to load$")
-	public void waitForUserListToLoad() {
-		isResponseContainsKey(baseUrl + getUsersPaginationPath, "user");
+	public void waitForUserListToLoad(DataTable dt) throws InterruptedException {
+		List<String> list = dt.asList(String.class);
+		 Long MAX_TIMEOUT = Long.valueOf(list.get(1));
+		 delayedResponse = getJsonResponseAsString(baseUrl + delayedResponsePath);	
 	}
 
 //verifying each ID is unique 
 	@Then("^I should see that every user has a unique id$")
 	public void uniqueIdVerify() throws JSONException {
 
-		String response = getJsonResponseAsString(baseUrl + getUsersPaginationPath);
-		JSONObject json = new JSONObject(response);
+	
+		JSONObject json = new JSONObject(delayedResponse);
 		int length = json.getJSONArray("data").length();
 		System.out.println(json.getJSONArray("data").get(2).toString().substring(1, 20));
 		for (int i = 0; i < length - 1; i++) {
+			Assert.assertFalse(json.getJSONArray("data").get(i).toString().substring(1, 20)
+					.equals(json.getJSONArray("data").get(i + 1).toString().substring(1, 20)));
 
-			if (json.getJSONArray("data").get(i).toString().substring(1, 20)
-					.equals(json.getJSONArray("data").get(i + 1).toString().substring(1, 20))) {
-				System.out.print("ID is not unique");
-			} else {
-				System.out.print("ID is  unique");
-			}
+			
+//			if (json.getJSONArray("data").get(i).toString().substring(1, 20)
+//					.equals(json.getJSONArray("data").get(i + 1).toString().substring(1, 20))) {
+//				System.out.print("ID is not unique");
+//			} else {
+//				System.out.print("ID is  unique");
+//			}
 		}
 	}
 
