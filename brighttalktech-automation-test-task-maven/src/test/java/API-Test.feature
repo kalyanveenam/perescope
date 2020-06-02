@@ -7,8 +7,8 @@ Scenario: Should see LIST USERS of all existing users
 		|200|
 		|first_name|
 	Then I should see total users count equals to number of user ids 
-		|responseDelayInSec|
-		|3|
+		|responseDelayInms|
+		|3000|
 		
 		
 		#provide valid user ID , flow is successful in that case
